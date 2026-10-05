@@ -194,11 +194,6 @@ def main() -> None:
     payload = {
         "titulo": "Painel Convenios — demo publica",
         "org": "IPASGO",
-        "aviso": (
-            "Versao compactada e anonimizada para demonstracao. "
-            "Contem apenas agregados por municipio (sem nomes, CPF, matricula "
-            "ou linhas individuais de folha). Remuneracoes medias arredondadas."
-        ),
         "competencia": {"ano": int(ano), "mes": int(mes)},
         "gerado_em": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
         "fonte": "TCMGO x beneficiarios_ipasgo (agregado local)",

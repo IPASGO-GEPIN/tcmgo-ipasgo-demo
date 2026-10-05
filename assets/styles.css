@@ -22,8 +22,8 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
 .brand { display: flex; gap: 16px; align-items: center; }
 .brand-logo {
   display: block;
-  height: 40px;
-  width: 148px;
+  height: 56px;
+  width: 210px;
   object-fit: cover;
   object-position: 42% 50%;
 }
@@ -33,11 +33,6 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
 }
 .top h1 { margin: 2px 0 0; font-size: 1.45rem; font-weight: 750; }
 .top-meta { color: var(--muted); font-size: 0.88rem; text-align: right; }
-
-.banner {
-  margin: 12px 28px 0; padding: 10px 14px; border-radius: 10px;
-  background: #f7f1e6; color: var(--muted); font-size: 0.84rem; border: 1px solid #eadfce;
-}
 
 .kpis {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
@@ -62,7 +57,7 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
 .panel-head { padding: 14px 16px 8px; }
 .panel-head h2 { margin: 0; font-size: 1rem; }
 .panel-head p { margin: 4px 0 0; color: var(--muted); font-size: 0.82rem; }
-#map { height: min(62vh, 560px); width: 100%; background: #eef2ef; }
+#map { height: min(62vh, 560px); width: 100%; background: #f7f5f0; }
 .legend {
   display: flex; align-items: center; gap: 8px; padding: 10px 16px 14px;
   font-size: 0.78rem; color: var(--muted);
@@ -116,6 +111,6 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
   #map { height: 420px; }
 }
 @media (max-width: 560px) {
-  .top, .banner, .kpis, .layout, .foot { padding-left: 14px; padding-right: 14px; }
+  .top, .kpis, .layout, .foot { padding-left: 14px; padding-right: 14px; }
   .kpis { grid-template-columns: 1fr; }
 }

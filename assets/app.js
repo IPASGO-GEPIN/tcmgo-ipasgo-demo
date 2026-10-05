@@ -127,7 +127,6 @@
       }),
     ]);
 
-    document.getElementById("aviso").textContent = data.aviso || "";
     document.getElementById("gerado").textContent = data.gerado_em
       ? `Gerado em ${data.gerado_em.replace("T", " ")}`
       : "";
@@ -139,16 +138,12 @@
         .map((m) => [String(m.codigo_ibge), m])
     );
 
-    const map = L.map("map", { scrollWheelZoom: true, zoomControl: true }).setView(
-      [-15.95, -49.58],
-      7
-    );
-    // OpenStreetMap (sem API key; CARTO passou a exigir chave em basemaps.cartocdn.com)
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 19,
-    }).addTo(map);
+    const map = L.map("map", {
+      scrollWheelZoom: true,
+      zoomControl: true,
+      attributionControl: false,
+    }).setView([-15.95, -49.58], 7);
+    // Sem tiles de fundo: só o contorno dos municípios de Goiás
 
     let selected = null;
     const layer = L.geoJSON(geo, {
@@ -158,9 +153,9 @@
         const cob = m ? m.cobertura_camara_pct : null;
         return {
           fillColor: colorCob(cob),
-          weight: 0.7,
+          weight: 0.85,
           color: "#ffffff",
-          fillOpacity: 0.88,
+          fillOpacity: 1,
         };
       },
       onEachFeature(feature, lyr) {
@@ -174,7 +169,7 @@
         lyr.on("click", () => {
           if (selected) layer.resetStyle(selected);
           selected = lyr;
-          lyr.setStyle({ weight: 2.2, color: "#1b4332", fillOpacity: 0.95 });
+          lyr.setStyle({ weight: 2.2, color: "#1b4332", fillOpacity: 1 });
           lyr.bringToFront();
           renderSide(m || { municipio: nome, codigo_ibge: code }, data.competencia || {});
         });
@@ -182,7 +177,10 @@
     }).addTo(map);
 
     try {
-      map.fitBounds(layer.getBounds(), { padding: [12, 12] });
+      const bounds = layer.getBounds();
+      map.fitBounds(bounds, { padding: [18, 18], maxZoom: 8 });
+      map.setMaxBounds(bounds.pad(0.08));
+      map.options.minZoom = map.getZoom() - 0.5;
     } catch (_) {
       /* ignore */
     }
