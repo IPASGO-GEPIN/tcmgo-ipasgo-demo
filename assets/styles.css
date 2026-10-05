@@ -19,11 +19,13 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
   padding: 22px 28px 14px; flex-wrap: wrap;
   border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #fff 0%, var(--sand) 100%);
 }
-.brand { display: flex; gap: 14px; align-items: center; }
-.brand-mark {
-  display: inline-flex; align-items: center; justify-content: center;
-  min-width: 64px; height: 40px; padding: 0 10px; border-radius: 10px;
-  background: var(--green); color: #fff; font-weight: 750; letter-spacing: 0.04em; font-size: 0.85rem;
+.brand { display: flex; gap: 16px; align-items: center; }
+.brand-logo {
+  display: block;
+  height: 40px;
+  width: 148px;
+  object-fit: cover;
+  object-position: 42% 50%;
 }
 .eyebrow {
   margin: 0; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;

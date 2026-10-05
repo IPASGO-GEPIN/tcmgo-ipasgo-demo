@@ -62,6 +62,8 @@ Depois: `git add data/municipios.json && git commit && git push`.
 index.html
 assets/app.js
 assets/styles.css
+assets/logo-ipasgo.svg
+assets/favicon.png
 data/municipios.json      ← gerado pelo script de atualização
 data/go_municipios.geojson
 scripts/export_demo_data.py
