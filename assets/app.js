@@ -158,7 +158,8 @@
 
     let selected = null;
     const layerByCode = new Map();
-    const labels = L.layerGroup().addTo(map);
+    const labels = L.layerGroup();
+    const LABEL_MIN_ZOOM = 8; // nomes só aparecem com zoom aproximado
 
     function selectFeature(lyr, m, nome, code) {
       if (selected) layer.resetStyle(selected);
@@ -260,16 +261,20 @@
       /* ignore */
     }
 
-    // Em zoom baixo, reduz um pouco o tamanho do rótulo
-    function syncLabelSize() {
+    function syncLabelsVisibility() {
       const z = map.getZoom();
-      const size = z >= 8 ? "10px" : z >= 7 ? "9px" : "8px";
-      document.querySelectorAll(".muni-label").forEach((el) => {
-        el.style.fontSize = size;
-      });
+      if (z >= LABEL_MIN_ZOOM) {
+        if (!map.hasLayer(labels)) labels.addTo(map);
+        const size = z >= 9 ? "10px" : "9px";
+        document.querySelectorAll(".muni-label").forEach((el) => {
+          el.style.fontSize = size;
+        });
+      } else if (map.hasLayer(labels)) {
+        map.removeLayer(labels);
+      }
     }
-    map.on("zoomend", syncLabelSize);
-    syncLabelSize();
+    map.on("zoomend", syncLabelsVisibility);
+    syncLabelsVisibility();
   }
 
   main().catch((err) => {
