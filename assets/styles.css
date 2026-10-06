@@ -54,10 +54,53 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
   box-shadow: 0 1px 2px rgba(47,48,42,0.04), 0 8px 24px rgba(47,48,42,0.05);
   overflow: hidden;
 }
-.panel-head { padding: 14px 16px 8px; }
+.panel-head { padding: 14px 16px 10px; }
+.panel-head-row {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
 .panel-head h2 { margin: 0; font-size: 1rem; }
 .panel-head p { margin: 4px 0 0; color: var(--muted); font-size: 0.82rem; }
+.muni-search { flex: 1 1 200px; max-width: 280px; }
+.muni-search input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 0.88rem;
+  color: var(--ink);
+  background: #fff;
+  outline: none;
+}
+.muni-search input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(0, 121, 64, 0.12);
+}
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
 #map { height: min(62vh, 560px); width: 100%; background: #f7f5f0; }
+.muni-label {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #1b4332;
+  font-weight: 700;
+  font-size: 9px;
+  line-height: 1.1;
+  text-align: center;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 3px #fff,
+    1px 1px 0 #fff,
+    -1px -1px 0 #fff,
+    1px -1px 0 #fff,
+    -1px 1px 0 #fff;
+  white-space: nowrap;
+  pointer-events: none !important;
+}
+.muni-label span { display: block; max-width: 72px; overflow: hidden; text-overflow: ellipsis; }
 .legend {
   display: flex; align-items: center; gap: 8px; padding: 10px 16px 14px;
   font-size: 0.78rem; color: var(--muted);

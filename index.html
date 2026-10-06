@@ -29,8 +29,23 @@
   <main class="layout">
     <section class="map-panel">
       <div class="panel-head">
-        <h2>% com IPASGO na Câmara</h2>
-        <p>Verde = maior cobertura. Clique no município.</p>
+        <div class="panel-head-row">
+          <div>
+            <h2>% com IPASGO na Câmara</h2>
+            <p>Verde = maior cobertura. Clique ou pesquise o município.</p>
+          </div>
+          <div class="muni-search">
+            <label class="sr-only" for="muniSearch">Pesquisar município</label>
+            <input
+              id="muniSearch"
+              type="search"
+              list="muniList"
+              placeholder="Pesquisar município…"
+              autocomplete="off"
+            />
+            <datalist id="muniList"></datalist>
+          </div>
+        </div>
       </div>
       <div id="map"></div>
       <div class="legend" id="legend"></div>

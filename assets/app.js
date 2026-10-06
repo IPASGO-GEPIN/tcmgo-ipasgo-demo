@@ -14,7 +14,11 @@
   const fmtBrl = (n) =>
     n == null || Number.isNaN(Number(n))
       ? "—"
-      : Number(n).toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+      : Number(n).toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+          maximumFractionDigits: 0,
+        });
 
   function colorCob(v) {
     if (v == null || Number.isNaN(v)) return "#d8d3c8";
@@ -35,7 +39,7 @@
       .map((r) => {
         const pct = Math.max(0, Math.min(100, Number(r.pct) || 0));
         return `<div class="bar-row">
-          <span title="${r.categoria}">${escapeHtml(truncate(r.categoria, 28))}</span>
+          <span title="${escapeHtml(r.categoria)}">${escapeHtml(truncate(r.categoria, 28))}</span>
           <div class="bar-track"><div class="bar-fill ${alt ? "alt" : ""}" style="width:${pct}%"></div></div>
           <span>${fmtPct(r.pct)}</span>
         </div>`;
@@ -54,6 +58,14 @@
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;");
+  }
+
+  function normTxt(s) {
+    return String(s || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
   }
 
   function renderKpis(k, comp) {
@@ -143,9 +155,24 @@
       zoomControl: true,
       attributionControl: false,
     }).setView([-15.95, -49.58], 7);
-    // Sem tiles de fundo: só o contorno dos municípios de Goiás
 
     let selected = null;
+    const layerByCode = new Map();
+    const labels = L.layerGroup().addTo(map);
+
+    function selectFeature(lyr, m, nome, code) {
+      if (selected) layer.resetStyle(selected);
+      selected = lyr;
+      lyr.setStyle({ weight: 2.4, color: "#1b4332", fillOpacity: 1 });
+      lyr.bringToFront();
+      renderSide(m || { municipio: nome, codigo_ibge: code }, data.competencia || {});
+      try {
+        map.fitBounds(lyr.getBounds(), { padding: [40, 40], maxZoom: 9 });
+      } catch (_) {
+        /* ignore */
+      }
+    }
+
     const layer = L.geoJSON(geo, {
       style(feature) {
         const code = String(feature.properties.codigo_ibge || feature.properties.id || "");
@@ -163,18 +190,66 @@
         const m = byIbge.get(code);
         const nome = (m && m.municipio) || feature.properties.name || code;
         const cob = m ? fmtPct(m.cobertura_camara_pct) : "—";
-        lyr.bindTooltip(`<strong>${escapeHtml(nome)}</strong><br/>% IPASGO Câmara: ${cob}`, {
-          sticky: true,
+        layerByCode.set(code, { lyr, m, nome });
+
+        lyr.bindTooltip(
+          `<strong>${escapeHtml(nome)}</strong><br/>% IPASGO Câmara: ${cob}`,
+          { sticky: true }
+        );
+        lyr.on("click", () => selectFeature(lyr, m, nome, code));
+
+        const center = lyr.getBounds().getCenter();
+        const label = L.marker(center, {
+          interactive: false,
+          keyboard: false,
+          icon: L.divIcon({
+            className: "muni-label",
+            html: `<span title="${escapeHtml(nome)}">${escapeHtml(truncate(nome, 16))}</span>`,
+            iconSize: [72, 14],
+            iconAnchor: [36, 7],
+          }),
         });
-        lyr.on("click", () => {
-          if (selected) layer.resetStyle(selected);
-          selected = lyr;
-          lyr.setStyle({ weight: 2.2, color: "#1b4332", fillOpacity: 1 });
-          lyr.bringToFront();
-          renderSide(m || { municipio: nome, codigo_ibge: code }, data.competencia || {});
-        });
+        labels.addLayer(label);
       },
     }).addTo(map);
+
+    // Busca por nome
+    const names = [...layerByCode.values()]
+      .map((x) => x.nome)
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b, "pt-BR"));
+    const listEl = document.getElementById("muniList");
+    listEl.innerHTML = names
+      .map((n) => `<option value="${escapeHtml(n)}"></option>`)
+      .join("");
+
+    const search = document.getElementById("muniSearch");
+    function findByName(q) {
+      const nq = normTxt(q);
+      if (!nq) return null;
+      let hit = null;
+      for (const [code, entry] of layerByCode) {
+        const nn = normTxt(entry.nome);
+        if (nn === nq) return { code, ...entry };
+        if (!hit && nn.includes(nq)) hit = { code, ...entry };
+      }
+      return hit;
+    }
+
+    function applySearch() {
+      const hit = findByName(search.value);
+      if (!hit) return;
+      selectFeature(hit.lyr, hit.m, hit.nome, hit.code);
+      search.value = hit.nome;
+    }
+
+    search.addEventListener("change", applySearch);
+    search.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter") {
+        ev.preventDefault();
+        applySearch();
+      }
+    });
 
     try {
       const bounds = layer.getBounds();
@@ -184,6 +259,17 @@
     } catch (_) {
       /* ignore */
     }
+
+    // Em zoom baixo, reduz um pouco o tamanho do rótulo
+    function syncLabelSize() {
+      const z = map.getZoom();
+      const size = z >= 8 ? "10px" : z >= 7 ? "9px" : "8px";
+      document.querySelectorAll(".muni-label").forEach((el) => {
+        el.style.fontSize = size;
+      });
+    }
+    map.on("zoomend", syncLabelSize);
+    syncLabelSize();
   }
 
   main().catch((err) => {
